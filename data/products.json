@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "name": "Women Adidas shoes ",
+    "nameAr": "حذاء اديداس ",
+    "description": "",
+    "descriptionAr": null,
+    "price": 2000,
+    "originalPrice": 4000,
+    "imageUrl": "/api/storage/objects/product-images/652b5dbd-bafc-4c1a-a4e3-a2eb95413473.jpeg",
+    "images": [
+      "/api/storage/objects/product-images/712c84e7-7f6e-4678-b04a-2d8e20b4f291.jpeg",
+      "/api/storage/objects/product-images/d9ced294-4a17-47a8-b6fa-69a8ce26e211.jpeg",
+      "/api/storage/objects/product-images/15bdf75b-472f-4397-a3f9-74f181afb680.jpeg"
+    ],
+    "category": "Shoes",
+    "stock": 1,
+    "featured": false,
+    "origin": "Saudi Arabia",
+    "createdAt": "2026-03-30T12:42:55.428Z",
+    "updatedAt": "2026-03-30T12:42:55.428Z"
+  }
+]
