@@ -2,6 +2,7 @@ import { Router } from "express";
 import { db } from "@workspace/db";
 import { messages } from "@workspace/db/schema";
 import { desc, eq } from "drizzle-orm";
+import { syncToGitHubBackground } from "../lib/githubSync";
 
 const router = Router();
 
@@ -22,6 +23,7 @@ router.post("/messages", async (req, res) => {
     }
     const [created] = await db.insert(messages).values({ name, email, subject, message }).returning();
     res.status(201).json(created);
+    syncToGitHubBackground("message-received");
   } catch (err) {
     res.status(500).json({ error: "Failed to save message" });
   }

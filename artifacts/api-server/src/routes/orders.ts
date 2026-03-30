@@ -1,6 +1,7 @@
 import { Router, type IRouter } from "express";
 import { db, ordersTable, customersTable, insertOrderSchema, updateOrderSchema } from "@workspace/db";
 import { eq } from "drizzle-orm";
+import { syncToGitHubBackground } from "../lib/githubSync";
 
 const router: IRouter = Router();
 
@@ -56,6 +57,7 @@ router.post("/orders", async (req, res) => {
     }
 
     res.status(201).json(order);
+    syncToGitHubBackground("order-created");
   } catch (err) {
     req.log.error({ err }, "Failed to create order");
     res.status(500).json({ error: "Failed to create order" });
@@ -76,6 +78,7 @@ router.put("/orders/:id", async (req, res) => {
       .returning();
     if (!order) return res.status(404).json({ error: "Order not found" });
     res.json(order);
+    syncToGitHubBackground("order-updated");
   } catch (err) {
     req.log.error({ err }, "Failed to update order");
     res.status(500).json({ error: "Failed to update order" });

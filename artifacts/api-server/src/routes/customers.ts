@@ -1,6 +1,7 @@
 import { Router, type IRouter } from "express";
 import { db, customersTable, ordersTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
+import { syncToGitHubBackground } from "../lib/githubSync";
 const router: IRouter = Router();
 
 router.get("/customers", async (req, res) => {
@@ -47,6 +48,7 @@ router.put("/customers/:id", async (req, res) => {
 
     if (!customer) return res.status(404).json({ error: "Customer not found" });
     res.json(customer);
+    syncToGitHubBackground("customer-updated");
   } catch (err) {
     req.log.error({ err }, "Failed to update customer");
     res.status(500).json({ error: "Failed to update customer" });
@@ -58,6 +60,7 @@ router.delete("/customers/:id", async (req, res) => {
     const id = parseInt(req.params.id);
     await db.delete(customersTable).where(eq(customersTable.id, id));
     res.json({ success: true, message: "Customer deleted" });
+    syncToGitHubBackground("customer-deleted");
   } catch (err) {
     req.log.error({ err }, "Failed to delete customer");
     res.status(500).json({ error: "Failed to delete customer" });

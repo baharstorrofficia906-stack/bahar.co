@@ -1,13 +1,13 @@
 import { Router, type IRouter } from "express";
 import { db, productsTable, insertProductSchema, updateProductSchema } from "@workspace/db";
 import { eq } from "drizzle-orm";
+import { syncToGitHubBackground } from "../lib/githubSync";
 
 const router: IRouter = Router();
 
 router.get("/products", async (req, res) => {
   try {
     const { category, featured } = req.query;
-    let query = db.select().from(productsTable);
     const products = await db.select().from(productsTable);
 
     let filtered = products;
@@ -45,6 +45,7 @@ router.post("/products", async (req, res) => {
     }
     const [product] = await db.insert(productsTable).values(parsed.data).returning();
     res.status(201).json(product);
+    syncToGitHubBackground("product-created");
   } catch (err) {
     req.log.error({ err }, "Failed to create product");
     res.status(500).json({ error: "Failed to create product" });
@@ -65,6 +66,7 @@ router.put("/products/:id", async (req, res) => {
       .returning();
     if (!product) return res.status(404).json({ error: "Product not found" });
     res.json(product);
+    syncToGitHubBackground("product-updated");
   } catch (err) {
     req.log.error({ err }, "Failed to update product");
     res.status(500).json({ error: "Failed to update product" });
@@ -76,6 +78,7 @@ router.delete("/products/:id", async (req, res) => {
     const id = parseInt(req.params.id);
     await db.delete(productsTable).where(eq(productsTable.id, id));
     res.json({ success: true, message: "Product deleted" });
+    syncToGitHubBackground("product-deleted");
   } catch (err) {
     req.log.error({ err }, "Failed to delete product");
     res.status(500).json({ error: "Failed to delete product" });
