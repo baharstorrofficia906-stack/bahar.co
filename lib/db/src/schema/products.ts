@@ -12,6 +12,7 @@ export const productsTable = pgTable("products", {
   originalPrice: real("original_price"),
   imageUrl: text("image_url"),
   images: jsonb("images").$type<string[]>().default([]),
+  sizes: jsonb("sizes").$type<string[]>().default([]),
   category: text("category"),
   stock: integer("stock").notNull().default(0),
   featured: boolean("featured").notNull().default(false),
