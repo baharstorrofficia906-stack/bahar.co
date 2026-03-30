@@ -1,1 +1,10 @@
-{"lastSync":"2026-03-30T12:36:28Z","triggeredBy":"manual-verify","counts":{"products":0,"customers":0,"orders":0,"messages":1}}
+{
+  "lastSync": "2026-03-30T12:49:37.323Z",
+  "triggeredBy": "order-updated",
+  "counts": {
+    "products": 1,
+    "customers": 1,
+    "orders": 1,
+    "messages": 0
+  }
+}
