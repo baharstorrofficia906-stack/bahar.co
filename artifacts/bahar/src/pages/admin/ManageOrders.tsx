@@ -3,6 +3,7 @@ import { useGetOrders, useUpdateOrder } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { ShoppingBag } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
+import { PlaneLoader } from "@/components/ui/PlaneLoader";
 
 export default function ManageOrders() {
   const queryClient = useQueryClient();
@@ -32,7 +33,7 @@ export default function ManageOrders() {
 
       <div className="space-y-4">
         {isLoading ? (
-          <div className="text-center p-12 bg-white rounded-2xl">{t.admin.orders.loading}</div>
+          <PlaneLoader text="Loading orders..." />
         ) : orders?.length === 0 ? (
           <div className="text-center p-12 bg-white rounded-2xl border border-dashed flex flex-col items-center">
             <ShoppingBag className="w-12 h-12 text-muted-foreground mb-4 opacity-50" />

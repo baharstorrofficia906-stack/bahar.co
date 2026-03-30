@@ -11,6 +11,7 @@ import {
 } from "@workspace/api-client-react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { useQueryClient } from "@tanstack/react-query";
+import { PlaneLoader } from "@/components/ui/PlaneLoader";
 import { useForm } from "react-hook-form";
 import { Package, ShoppingCart, DollarSign, Users, Edit2, Trash2, X, Tag, Mail, MailOpen } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
@@ -78,14 +79,7 @@ export default function Dashboard() {
   if (isLoading) {
     return (
       <AdminLayout>
-        <div className="animate-pulse space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-32 bg-white rounded-2xl"></div>
-            ))}
-          </div>
-          <div className="h-96 bg-white rounded-2xl"></div>
-        </div>
+        <PlaneLoader text="Loading dashboard..." />
       </AdminLayout>
     );
   }

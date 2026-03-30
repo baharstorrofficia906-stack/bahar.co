@@ -2,6 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useGetMessages, useMarkMessageRead } from "@workspace/api-client-react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { Mail, MailOpen, Reply, Clock, User, AtSign } from "lucide-react";
+import { PlaneLoader } from "@/components/ui/PlaneLoader";
 
 export default function ManageMessages() {
   const queryClient = useQueryClient();
@@ -34,11 +35,7 @@ export default function ManageMessages() {
 
       {/* Messages List */}
       {isLoading ? (
-        <div className="space-y-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-36 bg-white rounded-2xl animate-pulse border border-border" />
-          ))}
-        </div>
+        <PlaneLoader text="Loading messages..." />
       ) : !messages || messages.length === 0 ? (
         <div className="bg-white rounded-2xl border border-dashed border-border p-16 text-center">
           <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">

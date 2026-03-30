@@ -5,6 +5,7 @@ import { Plus, Edit2, Trash2, X, Image as ImageIcon, UploadCloud } from "lucide-
 import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useLanguage } from "@/hooks/use-language";
+import { PlaneLoader } from "@/components/ui/PlaneLoader";
 
 export default function ManageProducts() {
   const queryClient = useQueryClient();
@@ -128,7 +129,7 @@ export default function ManageProducts() {
           </thead>
           <tbody className="divide-y divide-border">
             {isLoading ? (
-              <tr><td colSpan={6} className="px-6 py-8 text-center">{t.admin.products.loading}</td></tr>
+              <tr><td colSpan={6} className="px-6 py-8"><PlaneLoader text="Loading products..." /></td></tr>
             ) : products?.map(p => {
               const allImgs = [
                 ...(p.imageUrl ? [p.imageUrl] : []),

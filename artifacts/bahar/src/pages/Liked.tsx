@@ -3,6 +3,7 @@ import { useGetProducts } from "@workspace/api-client-react";
 import { ProductCard } from "@/components/ui/ProductCard";
 import { useLikedProducts } from "@/hooks/use-liked-products";
 import { Link } from "wouter";
+import { PlaneLoader } from "@/components/ui/PlaneLoader";
 
 export default function Liked() {
   const { likedIds, clearLikes } = useLikedProducts();
@@ -36,11 +37,7 @@ export default function Liked() {
         </div>
 
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map(i => (
-              <div key={i} className="bg-card/50 animate-pulse rounded-2xl h-[400px]"></div>
-            ))}
-          </div>
+          <PlaneLoader text="Loading your favourites..." />
         ) : likedProducts.length === 0 ? (
           <div className="text-center py-24 bg-white rounded-3xl border border-dashed border-border">
             <Heart className="mx-auto text-muted-foreground/30 mb-4" size={48} />

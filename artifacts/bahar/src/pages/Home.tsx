@@ -5,6 +5,7 @@ import { Star, Shield, Truck, Search, SlidersHorizontal, Sparkles } from "lucide
 import { useGetProducts } from "@workspace/api-client-react";
 import { ProductCard } from "@/components/ui/ProductCard";
 import { useLanguage } from "@/hooks/use-language";
+import { PlaneLoader } from "@/components/ui/PlaneLoader";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
@@ -230,11 +231,7 @@ export default function Home() {
 
           {/* Product Grid */}
           {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-                <div key={i} className="bg-card/50 animate-pulse rounded-2xl h-[400px]"></div>
-              ))}
-            </div>
+            <PlaneLoader text="Loading products..." />
           ) : filtered.length === 0 ? (
             <motion.div
               initial={{ opacity: 0 }}

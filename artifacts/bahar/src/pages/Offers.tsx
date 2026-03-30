@@ -3,6 +3,7 @@ import { Countdown } from "@/components/ui/Countdown";
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import { useToast } from "@/hooks/use-toast";
+import { PlaneLoader } from "@/components/ui/PlaneLoader";
 
 export default function Offers() {
   const { data: offers, isLoading } = useGetOffers();
@@ -26,11 +27,7 @@ export default function Offers() {
         </div>
 
         {isLoading ? (
-          <div className="space-y-8">
-            {[1, 2].map(i => (
-              <div key={i} className="bg-white/5 animate-pulse rounded-3xl h-[400px]"></div>
-            ))}
-          </div>
+          <PlaneLoader text="Loading offers..." />
         ) : (
           <div className="space-y-12">
             {offers?.filter(o => o.active).map((offer) => {

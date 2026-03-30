@@ -9,6 +9,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { Edit2, Trash2, X, Users, Mail, MapPin, Phone } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
+import { PlaneLoader } from "@/components/ui/PlaneLoader";
 
 type CustomerForm = {
   name: string;
@@ -73,7 +74,7 @@ export default function ManageCustomers() {
 
       {/* Customer Cards Grid */}
       {isLoading ? (
-        <div className="text-center py-20 text-muted-foreground">{t.admin.customers.loading}</div>
+        <PlaneLoader text="Loading customers..." />
       ) : customers?.length === 0 ? (
         <div className="text-center py-20 text-muted-foreground">
           <Users size={48} className="mx-auto mb-4 opacity-20" />
