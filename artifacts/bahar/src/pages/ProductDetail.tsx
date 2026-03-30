@@ -83,7 +83,7 @@ export default function ProductDetail({ id }: ProductDetailProps) {
           Back to Collection
         </button>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-start">
 
           {/* Image Gallery */}
           <motion.div
@@ -92,7 +92,7 @@ export default function ProductDetail({ id }: ProductDetailProps) {
             transition={{ duration: 0.5 }}
           >
             {/* Main Image */}
-            <div className="relative aspect-square bg-white rounded-2xl overflow-hidden border border-border shadow-sm mb-4">
+            <div className="relative w-full max-w-sm mx-auto h-[340px] sm:h-[400px] bg-white rounded-2xl overflow-hidden border border-border shadow-sm mb-4">
               {allImages.length > 0 ? (
                 <img
                   src={allImages[activeImage]}
@@ -140,12 +140,12 @@ export default function ProductDetail({ id }: ProductDetailProps) {
 
             {/* Thumbnail strip */}
             {allImages.length > 1 && (
-              <div className="flex gap-3 overflow-x-auto pb-1">
+              <div className="flex gap-2 overflow-x-auto pb-1 max-w-sm mx-auto">
                 {allImages.map((img, i) => (
                   <button
                     key={i}
                     onClick={() => setActiveImage(i)}
-                    className={`w-20 h-20 rounded-xl overflow-hidden border-2 flex-shrink-0 transition-all bg-white ${
+                    className={`w-16 h-16 rounded-lg overflow-hidden border-2 flex-shrink-0 transition-all bg-white ${
                       i === activeImage ? "border-primary shadow-md" : "border-border opacity-60 hover:opacity-100"
                     }`}
                   >
