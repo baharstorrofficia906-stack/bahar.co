@@ -11,7 +11,7 @@ export default function Contact() {
     e.preventDefault();
     if (!form.name || !form.email || !form.message) return;
     createMessage.mutate(
-      { name: form.name, email: form.email, subject: form.subject, message: form.message },
+      { data: { name: form.name, email: form.email, subject: form.subject, message: form.message } },
       {
         onSuccess: () => {
           setSent(true);
