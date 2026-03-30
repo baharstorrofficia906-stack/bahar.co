@@ -10,14 +10,12 @@ import {
   Product,
 } from "@workspace/api-client-react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
-import { useLocation } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { Package, ShoppingCart, DollarSign, Users, Edit2, Trash2, X, Tag, Mail, MailOpen } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
 
 export default function Dashboard() {
-  const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
   const { t } = useLanguage();
 
@@ -77,12 +75,7 @@ export default function Dashboard() {
     }
   };
 
-  if (error) {
-    setLocation("/admin");
-    return null;
-  }
-
-  if (isLoading || !stats) {
+  if (isLoading) {
     return (
       <AdminLayout>
         <div className="animate-pulse space-y-6">
@@ -92,6 +85,28 @@ export default function Dashboard() {
             ))}
           </div>
           <div className="h-96 bg-white rounded-2xl"></div>
+        </div>
+      </AdminLayout>
+    );
+  }
+
+  if (error || !stats) {
+    return (
+      <AdminLayout>
+        <div className="flex flex-col items-center justify-center py-24 text-center">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+            <ShoppingCart size={28} className="text-red-400" />
+          </div>
+          <h3 className="font-serif text-xl font-bold text-secondary mb-2">Could not load dashboard</h3>
+          <p className="text-muted-foreground text-sm mb-6 max-w-sm">
+            There was a problem connecting to the server. Please try refreshing the page.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="btn-gold px-6 py-3 text-sm font-semibold rounded-xl"
+          >
+            Refresh
+          </button>
         </div>
       </AdminLayout>
     );
