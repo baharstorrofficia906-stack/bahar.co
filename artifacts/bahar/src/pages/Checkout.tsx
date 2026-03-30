@@ -8,11 +8,28 @@ import { useCart } from "@/hooks/use-cart";
 import { useCreateOrder } from "@workspace/api-client-react";
 import { useLanguage } from "@/hooks/use-language";
 
+const EGYPT_GOVERNORATES_EN = [
+  "Cairo", "Alexandria", "Giza", "Qalyubia", "Sharqia", "Dakahlia",
+  "Beheira", "Kafr el-Sheikh", "Gharbia", "Monufia", "Faiyum", "Beni Suef",
+  "Minya", "Asyut", "Sohag", "Qena", "Luxor", "Aswan", "Red Sea",
+  "New Valley", "Matruh", "North Sinai", "South Sinai", "Ismailia",
+  "Suez", "Port Said", "Damietta",
+];
+
+const EGYPT_GOVERNORATES_AR = [
+  "القاهرة", "الإسكندرية", "الجيزة", "القليوبية", "الشرقية", "الدقهلية",
+  "البحيرة", "كفر الشيخ", "الغربية", "المنوفية", "الفيوم", "بني سويف",
+  "المنيا", "أسيوط", "سوهاج", "قنا", "الأقصر", "أسوان", "البحر الأحمر",
+  "الوادي الجديد", "مطروح", "شمال سيناء", "جنوب سيناء", "الإسماعيلية",
+  "السويس", "بورسعيد", "دمياط",
+];
+
 const checkoutSchema = z.object({
   customerName: z.string().min(2, "Name is required"),
   customerPhone: z.string().min(10, "Valid phone number required"),
   customerEmail: z.string().email("Valid email required").optional().or(z.literal("")),
-  customerAddress: z.string().min(10, "Full address is required"),
+  governorate: z.string().min(1, "Please select a governorate"),
+  customerAddress: z.string().min(5, "Full address is required"),
   notes: z.string().optional(),
 });
 
@@ -23,7 +40,8 @@ export default function Checkout() {
   const { items, totalPrice, clearCart } = useCart();
   const [isSuccess, setIsSuccess] = useState(false);
   const createOrder = useCreateOrder();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const governorates = lang === "ar" ? EGYPT_GOVERNORATES_AR : EGYPT_GOVERNORATES_EN;
 
   const { register, handleSubmit, formState: { errors } } = useForm<CheckoutForm>({
     resolver: zodResolver(checkoutSchema)
@@ -40,9 +58,11 @@ export default function Checkout() {
   }
 
   const onSubmit = (data: CheckoutForm) => {
+    const { governorate, ...rest } = data;
     createOrder.mutate({
       data: {
-        ...data,
+        ...rest,
+        customerAddress: `${governorate} - ${data.customerAddress}`,
         items: items.map(i => ({
           productId: i.productId,
           productName: i.productName,
@@ -104,6 +124,20 @@ export default function Checkout() {
                     <label className="text-sm font-semibold text-secondary">{t.checkout.emailAddress} <span className="text-muted-foreground font-normal">({t.checkout.optional})</span></label>
                     <input {...register("customerEmail")} type="email" className="w-full bg-background border border-border rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 outline-none" />
                     {errors.customerEmail && <p className="text-xs text-destructive">{errors.customerEmail.message}</p>}
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-sm font-semibold text-secondary">{t.checkout.governorate} <span className="text-destructive">*</span></label>
+                    <select
+                      {...register("governorate")}
+                      className="w-full bg-background border border-border rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 outline-none appearance-none cursor-pointer text-secondary"
+                      defaultValue=""
+                    >
+                      <option value="" disabled>{t.checkout.governoratePlaceholder}</option>
+                      {governorates.map((gov) => (
+                        <option key={gov} value={gov}>{gov}</option>
+                      ))}
+                    </select>
+                    {errors.governorate && <p className="text-xs text-destructive">{errors.governorate.message}</p>}
                   </div>
                   <div className="space-y-2 md:col-span-2">
                     <label className="text-sm font-semibold text-secondary">{t.checkout.address} <span className="text-destructive">*</span></label>
