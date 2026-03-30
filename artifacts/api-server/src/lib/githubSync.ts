@@ -1,4 +1,5 @@
-import { db, productsTable, customersTable, ordersTable, messagesTable } from "@workspace/db";
+import { db, productsTable, customersTable, ordersTable } from "@workspace/db";
+import { messages as messagesTable } from "@workspace/db/schema";
 import { desc } from "drizzle-orm";
 
 const GITHUB_API = "https://api.github.com";
