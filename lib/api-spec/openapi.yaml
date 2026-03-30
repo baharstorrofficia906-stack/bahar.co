@@ -576,6 +576,10 @@ components:
           type: array
           items:
             type: string
+        sizes:
+          type: array
+          items:
+            type: string
         category:
           type: string
         stock:
@@ -618,6 +622,10 @@ components:
           type: array
           items:
             type: string
+        sizes:
+          type: array
+          items:
+            type: string
         category:
           type: string
         stock:
@@ -649,6 +657,10 @@ components:
         imageUrl:
           type: string
         images:
+          type: array
+          items:
+            type: string
+        sizes:
           type: array
           items:
             type: string

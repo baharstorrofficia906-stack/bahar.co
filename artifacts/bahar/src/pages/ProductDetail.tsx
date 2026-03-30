@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { ShoppingCart, Heart, ArrowLeft, Package, Star, Shield, Truck, ChevronLeft, ChevronRight } from "lucide-react";
+import { ShoppingCart, Heart, ArrowLeft, Package, Star, Shield, Truck, ChevronLeft, ChevronRight, Ruler } from "lucide-react";
 import { useGetProduct } from "@workspace/api-client-react";
 import { useCart } from "@/hooks/use-cart";
 import { useToast } from "@/hooks/use-toast";
@@ -19,6 +19,7 @@ export default function ProductDetail({ id }: ProductDetailProps) {
   const { toast } = useToast();
   const { isLiked, toggleLike } = useLikedProducts();
   const [activeImage, setActiveImage] = useState(0);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
 
   if (isLoading) {
     return (
@@ -50,11 +51,22 @@ export default function ProductDetail({ id }: ProductDetailProps) {
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
 
+  const availableSizes = Array.isArray((product as any).sizes) ? (product as any).sizes as string[] : [];
+  const requiresSize = availableSizes.length > 0;
+
   const handleAddToCart = () => {
-    addToCart(product);
+    if (requiresSize && !selectedSize) {
+      toast({
+        title: "Please select a size",
+        description: "Choose a size before adding to cart.",
+        className: "bg-destructive text-white border-none",
+      });
+      return;
+    }
+    addToCart(product, 1, selectedSize ?? undefined);
     toast({
       title: "Added to Cart",
-      description: `${product.name} has been added to your cart.`,
+      description: `${product.name}${selectedSize ? ` (Size ${selectedSize})` : ""} has been added to your cart.`,
       className: "bg-secondary text-white border-none",
     });
   };
@@ -223,6 +235,35 @@ export default function ProductDetail({ id }: ProductDetailProps) {
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-8">
                 <Shield size={14} />
                 <span>Origin: <span className="font-semibold text-secondary">{product.origin}</span></span>
+              </div>
+            )}
+
+            {/* Size Selector */}
+            {requiresSize && (
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <Ruler size={15} className="text-primary" />
+                  <span className="text-sm font-semibold text-secondary uppercase tracking-wider">Select Size</span>
+                  {!selectedSize && (
+                    <span className="text-xs text-destructive font-medium ml-auto">Required</span>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {availableSizes.map((size) => (
+                    <button
+                      key={size}
+                      type="button"
+                      onClick={() => setSelectedSize(size === selectedSize ? null : size)}
+                      className={`min-w-[48px] h-11 px-3 rounded-lg border-2 text-sm font-bold transition-all ${
+                        selectedSize === size
+                          ? "border-primary bg-primary text-white shadow-md scale-105"
+                          : "border-border bg-white text-secondary hover:border-primary hover:text-primary"
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
 

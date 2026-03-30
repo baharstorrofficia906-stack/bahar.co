@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { useGetProducts, useCreateProduct, useUpdateProduct, useDeleteProduct, useUploadImages, Product } from "@workspace/api-client-react";
-import { Plus, Edit2, Trash2, X, Image as ImageIcon, UploadCloud, Sparkles, Loader2, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, Edit2, Trash2, X, Image as ImageIcon, UploadCloud, Sparkles, Loader2, ChevronDown, ChevronUp, Ruler } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useLanguage } from "@/hooks/use-language";
@@ -27,8 +27,13 @@ export default function ManageProducts() {
   const [aiError, setAiError] = useState("");
   const [showAiPanel, setShowAiPanel] = useState(false);
 
+  const [productSizes, setProductSizes] = useState<string[]>([]);
+  const [sizeInput, setSizeInput] = useState("");
+
   const { register, handleSubmit, reset, setValue, watch } = useForm<any>();
   const imageUrl = watch("imageUrl");
+  const watchCategory = watch("category");
+  const SIZED_CATEGORIES = ["Shoes", "Bags", "Abayas"];
 
   const openModal = (product?: Product) => {
     if (product) {
@@ -38,11 +43,14 @@ export default function ManageProducts() {
       if (product.imageUrl) existing.push(product.imageUrl);
       if (Array.isArray(product.images)) existing.push(...product.images);
       setUploadedImages(existing);
+      setProductSizes(Array.isArray((product as any).sizes) ? (product as any).sizes : []);
     } else {
       setEditingId(null);
       reset({ stock: 10, featured: false, category: "Dates" });
       setUploadedImages([]);
+      setProductSizes([]);
     }
+    setSizeInput("");
     setAiPrompt("");
     setAiError("");
     setShowAiPanel(true);
@@ -53,9 +61,19 @@ export default function ManageProducts() {
     setIsModalOpen(false);
     reset();
     setUploadedImages([]);
+    setProductSizes([]);
+    setSizeInput("");
     setAiPrompt("");
     setAiError("");
     setShowAiPanel(false);
+  };
+
+  const addSize = () => {
+    const s = sizeInput.trim().toUpperCase();
+    if (s && !productSizes.includes(s)) {
+      setProductSizes(prev => [...prev, s]);
+    }
+    setSizeInput("");
   };
 
   const handleAiGenerate = async () => {
@@ -127,6 +145,7 @@ export default function ManageProducts() {
       stock: Number(data.stock),
       imageUrl: primary ?? data.imageUrl ?? undefined,
       images: rest.length > 0 ? rest : [],
+      sizes: productSizes,
     };
 
     if (editingId) {
@@ -317,6 +336,46 @@ export default function ManageProducts() {
                   <input type="number" {...register("stock", { required: true })} className="w-full border rounded-lg p-3" />
                 </div>
               </div>
+
+              {/* Sizes (Shoes / Bags / Abayas) */}
+              {SIZED_CATEGORIES.includes(watchCategory) && (
+                <div className="space-y-3 p-4 bg-primary/5 border border-primary/20 rounded-xl">
+                  <div className="flex items-center gap-2">
+                    <Ruler size={15} className="text-primary" />
+                    <span className="text-sm font-semibold text-secondary">Available Sizes</span>
+                    <span className="text-xs text-muted-foreground ml-1">(customers will choose one)</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={sizeInput}
+                      onChange={e => setSizeInput(e.target.value)}
+                      onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addSize(); } }}
+                      placeholder="e.g. 38, 39, M, L, XL"
+                      className="flex-1 border rounded-lg px-3 py-2 text-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={addSize}
+                      className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-semibold hover:bg-primary/90"
+                    >
+                      Add
+                    </button>
+                  </div>
+                  {productSizes.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {productSizes.map(s => (
+                        <span key={s} className="inline-flex items-center gap-1 bg-white border border-primary/30 text-secondary text-sm font-bold px-3 py-1 rounded-lg">
+                          {s}
+                          <button type="button" onClick={() => setProductSizes(prev => prev.filter(x => x !== s))} className="text-muted-foreground hover:text-destructive ml-1">
+                            <X size={12} />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Multi-image Upload */}
               <div className="space-y-3">

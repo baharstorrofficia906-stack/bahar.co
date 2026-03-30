@@ -24,6 +24,7 @@ export interface Product {
   originalPrice?: number;
   imageUrl?: string;
   images?: string[];
+  sizes?: string[];
   category?: string;
   stock: number;
   featured: boolean;
@@ -41,6 +42,7 @@ export interface CreateProductInput {
   originalPrice?: number;
   imageUrl?: string;
   images?: string[];
+  sizes?: string[];
   category?: string;
   stock: number;
   featured?: boolean;
@@ -56,6 +58,7 @@ export interface UpdateProductInput {
   originalPrice?: number;
   imageUrl?: string;
   images?: string[];
+  sizes?: string[];
   category?: string;
   stock?: number;
   featured?: boolean;

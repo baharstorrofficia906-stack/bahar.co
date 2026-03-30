@@ -38,7 +38,7 @@ export default function Cart() {
             </div>
 
             {items.map((item) => (
-              <div key={item.productId} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center py-6 border-b border-border/50">
+              <div key={`${item.productId}-${item.selectedSize ?? ""}`} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center py-6 border-b border-border/50">
                 <div className="col-span-1 md:col-span-6 flex items-center gap-6">
                   <div className="w-24 h-24 bg-muted rounded-xl flex-shrink-0 overflow-hidden">
                     {item.imageUrl ? (
@@ -49,6 +49,11 @@ export default function Cart() {
                   </div>
                   <div>
                     <h3 className="font-serif font-bold text-secondary text-lg mb-1">{item.productName}</h3>
+                    {item.selectedSize && (
+                      <div className="inline-flex items-center gap-1 text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-md mb-1">
+                        Size: {item.selectedSize}
+                      </div>
+                    )}
                     <div className="text-sm font-medium text-muted-foreground">EGP {item.unitPrice.toLocaleString()}</div>
                   </div>
                 </div>
@@ -56,14 +61,14 @@ export default function Cart() {
                 <div className="col-span-1 md:col-span-2 flex justify-start md:justify-center mt-4 md:mt-0">
                   <div className="flex items-center bg-white border border-border rounded-lg p-1 shadow-sm">
                     <button
-                      onClick={() => updateQuantity(item.productId, item.quantity - 1)}
+                      onClick={() => updateQuantity(item.productId, item.quantity - 1, item.selectedSize)}
                       className="w-8 h-8 flex items-center justify-center text-secondary hover:text-primary transition-colors"
                     >
                       <Minus size={14} />
                     </button>
                     <span className="w-8 text-center font-semibold text-secondary">{item.quantity}</span>
                     <button
-                      onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                      onClick={() => updateQuantity(item.productId, item.quantity + 1, item.selectedSize)}
                       className="w-8 h-8 flex items-center justify-center text-secondary hover:text-primary transition-colors"
                     >
                       <Plus size={14} />
@@ -79,7 +84,7 @@ export default function Cart() {
 
                 <div className="col-span-1 md:col-span-1 text-right mt-[-40px] md:mt-0">
                   <button
-                    onClick={() => removeFromCart(item.productId)}
+                    onClick={() => removeFromCart(item.productId, item.selectedSize)}
                     className="p-2 text-muted-foreground hover:text-destructive transition-colors"
                   >
                     <Trash2 size={20} />
