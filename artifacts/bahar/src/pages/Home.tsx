@@ -1,10 +1,20 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { ArrowRight, Star, Shield, Truck, Search, SlidersHorizontal } from "lucide-react";
+import { Star, Shield, Truck, Search, SlidersHorizontal, Sparkles } from "lucide-react";
 import { useGetProducts } from "@workspace/api-client-react";
 import { ProductCard } from "@/components/ui/ProductCard";
 import { useLanguage } from "@/hooks/use-language";
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 28 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] } },
+};
+
+const staggerContainer = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.12 } },
+};
 
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -46,15 +56,45 @@ export default function Home() {
           <div className="absolute inset-0 bg-gradient-to-t from-secondary via-secondary/80 to-transparent"></div>
         </div>
 
+        {/* Floating ambient particles */}
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+          {[...Array(6)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-1 h-1 rounded-full bg-primary/40"
+              style={{
+                left: `${15 + i * 14}%`,
+                top: `${30 + (i % 3) * 20}%`,
+              }}
+              animate={{
+                y: [-12, 12, -12],
+                opacity: [0.2, 0.7, 0.2],
+              }}
+              transition={{
+                duration: 3 + i * 0.7,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: i * 0.4,
+              }}
+            />
+          ))}
+        </div>
+
         <div className="container relative z-10 px-4 md:px-6 text-center text-white">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <span className="inline-block text-primary font-bold tracking-[0.2em] text-sm uppercase mb-6 px-4 py-1.5 border border-primary/30 rounded-full backdrop-blur-sm">
+            <motion.span
+              className="inline-flex items-center gap-2 text-primary font-bold tracking-[0.2em] text-sm uppercase mb-6 px-4 py-1.5 border border-primary/30 rounded-full backdrop-blur-sm"
+              animate={{ boxShadow: ["0 0 0px rgba(212,175,55,0)", "0 0 18px rgba(212,175,55,0.35)", "0 0 0px rgba(212,175,55,0)"] }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <Sparkles size={13} />
               {t.home.badge}
-            </span>
+              <Sparkles size={13} />
+            </motion.span>
           </motion.div>
 
           <motion.h1
@@ -63,7 +103,7 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="font-serif text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight"
           >
-            {t.home.hero1} <br />
+            <span className="text-[#e8c97a]">{t.home.hero1}</span> <br />
             <span className="gold-gradient-text">{t.home.hero2}</span>
           </motion.h1>
 
@@ -81,22 +121,45 @@ export default function Home() {
             </Link>
           </motion.div>
         </div>
+
+        {/* Scroll indicator */}
+        <motion.div
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-white/40"
+          animate={{ y: [0, 6, 0] }}
+          transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <div className="w-px h-8 bg-gradient-to-b from-transparent to-white/30 rounded-full" />
+        </motion.div>
       </section>
 
       {/* Features Ribbon */}
       <section className="bg-primary/10 py-12 border-b border-primary/20">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 divide-y md:divide-y-0 md:divide-x divide-primary/20">
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.3 }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-8 divide-y md:divide-y-0 md:divide-x divide-primary/20"
+          >
             {features.map((feature, idx) => (
-              <div key={idx} className="flex flex-col items-center text-center px-4 pt-6 md:pt-0 first:pt-0">
-                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-4">
+              <motion.div
+                key={idx}
+                variants={fadeUp}
+                className="flex flex-col items-center text-center px-4 pt-6 md:pt-0 first:pt-0"
+              >
+                <motion.div
+                  whileHover={{ scale: 1.12, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                  className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-4 cursor-default"
+                >
                   {feature.icon}
-                </div>
+                </motion.div>
                 <h3 className="font-serif font-bold text-secondary text-lg mb-2">{feature.title}</h3>
                 <p className="text-muted-foreground text-sm">{feature.desc}</p>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -105,19 +168,38 @@ export default function Home() {
         <div className="absolute top-0 left-0 w-full h-96 bg-secondary/5 -z-10"></div>
 
         <div className="container mx-auto px-4 md:px-6">
-          <div className="text-center max-w-3xl mx-auto mb-12">
-            <span className="text-primary font-bold tracking-widest text-xs uppercase mb-2 block">{t.home.curatedSelection}</span>
-            <h2 className="font-serif text-4xl md:text-5xl font-bold text-secondary mb-4">{t.home.featuredTitle}</h2>
-            <p className="text-muted-foreground">Explore our curated selection of premium Saudi products, imported directly to ensure the highest quality and authenticity.</p>
-          </div>
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.3 }}
+            className="text-center max-w-3xl mx-auto mb-12"
+          >
+            <motion.span variants={fadeUp} className="text-primary font-bold tracking-widest text-xs uppercase mb-2 block">
+              {t.home.curatedSelection}
+            </motion.span>
+            <motion.h2 variants={fadeUp} className="font-serif text-4xl md:text-5xl font-bold text-secondary mb-4">
+              {t.home.featuredTitle}
+            </motion.h2>
+            <motion.p variants={fadeUp} className="text-muted-foreground">
+              Explore our curated selection of premium Saudi products, imported directly to ensure the highest quality and authenticity.
+            </motion.p>
+          </motion.div>
 
           {/* Filters Bar */}
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 bg-card p-4 rounded-2xl shadow-sm border border-border/50">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 bg-card p-4 rounded-2xl shadow-sm border border-border/50"
+          >
             <div className="flex overflow-x-auto w-full md:w-auto pb-2 md:pb-0 hide-scrollbar gap-2">
               {categories.map((cat) => (
-                <button
+                <motion.button
                   key={cat}
                   onClick={() => setActiveCategory(cat === "All" ? null : cat)}
+                  whileTap={{ scale: 0.94 }}
                   className={`whitespace-nowrap px-6 py-2.5 rounded-full text-sm font-semibold transition-all ${
                     (activeCategory === cat || (cat === "All" && !activeCategory))
                       ? "bg-secondary text-white shadow-md"
@@ -125,7 +207,7 @@ export default function Home() {
                   }`}
                 >
                   {getCategoryLabel(cat)}
-                </button>
+                </motion.button>
               ))}
             </div>
 
@@ -144,7 +226,7 @@ export default function Home() {
                 <SlidersHorizontal className="w-5 h-5" />
               </button>
             </div>
-          </div>
+          </motion.div>
 
           {/* Product Grid */}
           {isLoading ? (
@@ -154,16 +236,33 @@ export default function Home() {
               ))}
             </div>
           ) : filtered.length === 0 ? (
-            <div className="text-center py-24 bg-white rounded-3xl border border-dashed border-border">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-24 bg-white rounded-3xl border border-dashed border-border"
+            >
               <h3 className="font-serif text-2xl text-secondary mb-2">{t.products.noProducts}</h3>
               <p className="text-muted-foreground">Try selecting a different category.</p>
-            </div>
+            </motion.div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
-              {filtered.map((product) => (
-                <ProductCard key={product.id} product={product} />
+            <motion.div
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, amount: 0.05 }}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8"
+            >
+              {filtered.map((product, i) => (
+                <motion.div
+                  key={product.id}
+                  variants={fadeUp}
+                  custom={i}
+                  layout
+                >
+                  <ProductCard product={product} />
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           )}
         </div>
       </section>
@@ -172,17 +271,33 @@ export default function Home() {
       <section className="py-24 bg-card relative overflow-hidden">
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex flex-col lg:flex-row items-center gap-16">
-            <div className="lg:w-1/2 relative">
+            <motion.div
+              initial={{ opacity: 0, x: -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              className="lg:w-1/2 relative"
+            >
               <div className="aspect-[4/5] bg-secondary rounded-2xl overflow-hidden relative shadow-2xl">
                 <img src="https://pixabay.com/get/gf9e8b21e954d99ba9678863ae734fc3a12eaa782d37adbf003452db1ae2d8216ca81df6f6b62edd55b4a5aec75e07fb1de515d4b2657b40113029b3e8236fc80_1280.jpg" alt="Saudi Coffee" className="w-full h-full object-cover opacity-80 mix-blend-luminosity" />
                 <div className="absolute inset-0 border-2 border-primary/30 rounded-2xl m-4"></div>
               </div>
-              <div className="absolute -bottom-8 -right-8 w-48 h-48 bg-background rounded-full flex items-center justify-center shadow-lg p-6">
+              <motion.div
+                animate={{ y: [0, -6, 0] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute -bottom-8 -right-8 w-48 h-48 bg-background rounded-full flex items-center justify-center shadow-lg p-6"
+              >
                 <p className="font-serif italic text-xl text-center text-secondary">"{t.home.authenticityQuote}"</p>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
 
-            <div className="lg:w-1/2 lg:pl-8">
+            <motion.div
+              initial={{ opacity: 0, x: 40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+              className="lg:w-1/2 lg:pl-8"
+            >
               <span className="text-primary font-bold tracking-widest text-xs uppercase mb-4 block">{t.home.baharPromise}</span>
               <h2 className="font-serif text-4xl md:text-5xl font-bold text-secondary mb-6 leading-tight">{t.home.bridgingTitle}</h2>
               <p className="text-muted-foreground text-lg mb-6 leading-relaxed">
@@ -191,10 +306,12 @@ export default function Home() {
               <p className="arabic-text text-secondary/80 text-xl mb-10 leading-relaxed border-l-4 border-primary pl-4">
                 نحن نؤمن بأن الجودة لا تعترف بالحدود. منتجاتنا مختارة بعناية فائقة لترضي ذوقكم الرفيع.
               </p>
-              <Link href="/about" className="btn-luxury px-8 py-4 inline-block text-sm tracking-wider">
-                {t.home.discoverStory}
-              </Link>
-            </div>
+              <motion.div whileHover={{ x: 4 }} transition={{ type: "spring", stiffness: 400, damping: 20 }}>
+                <Link href="/about" className="btn-luxury px-8 py-4 inline-block text-sm tracking-wider">
+                  {t.home.discoverStory}
+                </Link>
+              </motion.div>
+            </motion.div>
           </div>
         </div>
       </section>

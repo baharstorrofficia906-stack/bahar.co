@@ -26,6 +26,7 @@ import ManageProducts from "@/pages/admin/ManageProducts";
 import ManageOffers from "@/pages/admin/ManageOffers";
 import ManageOrders from "@/pages/admin/ManageOrders";
 import ManageCustomers from "@/pages/admin/ManageCustomers";
+import ManageMessages from "@/pages/admin/ManageMessages";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +50,7 @@ function Router() {
       <Route path="/admin/offers" component={ManageOffers} />
       <Route path="/admin/orders" component={ManageOrders} />
       <Route path="/admin/customers" component={ManageCustomers} />
+      <Route path="/admin/messages" component={ManageMessages} />
 
       {/* Public Routes */}
       <Route>

@@ -1,13 +1,15 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, Package, Tag, ShoppingCart, Users, LogOut } from "lucide-react";
-import { useAdminLogout } from "@workspace/api-client-react";
+import { LayoutDashboard, Package, Tag, ShoppingCart, Users, LogOut, MessageSquare } from "lucide-react";
+import { useAdminLogout, useGetMessages } from "@workspace/api-client-react";
 import { useLanguage } from "@/hooks/use-language";
 
 export function AdminLayout({ children }: { children: ReactNode }) {
   const [location, setLocation] = useLocation();
   const logout = useAdminLogout();
   const { t } = useLanguage();
+  const { data: messages } = useGetMessages();
+  const unreadCount = messages?.filter((m) => !m.read).length ?? 0;
 
   const handleLogout = () => {
     logout.mutate(undefined, {
@@ -21,6 +23,12 @@ export function AdminLayout({ children }: { children: ReactNode }) {
     { name: t.admin.nav.offers, href: "/admin/offers", icon: <Tag size={20} /> },
     { name: t.admin.nav.orders, href: "/admin/orders", icon: <ShoppingCart size={20} /> },
     { name: t.admin.nav.customers, href: "/admin/customers", icon: <Users size={20} /> },
+    {
+      name: "Messages",
+      href: "/admin/messages",
+      icon: <MessageSquare size={20} />,
+      badge: unreadCount > 0 ? unreadCount : undefined,
+    },
   ];
 
   return (
@@ -48,7 +56,14 @@ export function AdminLayout({ children }: { children: ReactNode }) {
                 }`}
               >
                 {item.icon}
-                {item.name}
+                <span className="flex-1">{item.name}</span>
+                {item.badge !== undefined && (
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center ${
+                    active ? "bg-secondary/30 text-secondary" : "bg-blue-500 text-white"
+                  }`}>
+                    {item.badge}
+                  </span>
+                )}
               </Link>
             );
           })}

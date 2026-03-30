@@ -1,4 +1,5 @@
 import { Link } from "wouter";
+import { motion } from "framer-motion";
 import { ShoppingCart, Heart } from "lucide-react";
 import { Product } from "@workspace/api-client-react";
 import { useCart } from "@/hooks/use-cart";
@@ -50,7 +51,12 @@ export function ProductCard({ product }: ProductCardProps) {
   const mainImage = allImages[0];
 
   return (
-    <Link href={`/products?id=${product.id}`} className="group block">
+    <motion.div
+      whileHover={{ y: -6, boxShadow: "0 20px 40px rgba(0,0,0,0.12)" }}
+      transition={{ type: "spring", stiffness: 320, damping: 22 }}
+      className="h-full"
+    >
+    <Link href={`/products?id=${product.id}`} className="group block h-full">
       <div className="luxury-card overflow-hidden h-full flex flex-col relative bg-white">
         {/* Badges */}
         <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
@@ -137,5 +143,6 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
       </div>
     </Link>
+    </motion.div>
   );
 }
