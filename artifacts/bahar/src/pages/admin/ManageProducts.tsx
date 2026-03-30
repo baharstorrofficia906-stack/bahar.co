@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { useGetProducts, useCreateProduct, useUpdateProduct, useDeleteProduct, useUploadImages, Product } from "@workspace/api-client-react";
-import { Plus, Edit2, Trash2, X, Image as ImageIcon, UploadCloud } from "lucide-react";
+import { Plus, Edit2, Trash2, X, Image as ImageIcon, UploadCloud, Sparkles, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useLanguage } from "@/hooks/use-language";
@@ -22,6 +22,11 @@ export default function ManageProducts() {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [aiError, setAiError] = useState("");
+  const [showAiPanel, setShowAiPanel] = useState(false);
+
   const { register, handleSubmit, reset, setValue, watch } = useForm<any>();
   const imageUrl = watch("imageUrl");
 
@@ -38,6 +43,9 @@ export default function ManageProducts() {
       reset({ stock: 10, featured: false, category: "Dates" });
       setUploadedImages([]);
     }
+    setAiPrompt("");
+    setAiError("");
+    setShowAiPanel(true);
     setIsModalOpen(true);
   };
 
@@ -45,6 +53,40 @@ export default function ManageProducts() {
     setIsModalOpen(false);
     reset();
     setUploadedImages([]);
+    setAiPrompt("");
+    setAiError("");
+    setShowAiPanel(false);
+  };
+
+  const handleAiGenerate = async () => {
+    if (!aiPrompt.trim()) return;
+    setIsAiLoading(true);
+    setAiError("");
+    try {
+      const res = await fetch("/api/admin/ai/generate-product", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description: aiPrompt }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "AI generation failed");
+      }
+      const { product } = await res.json();
+      if (product.name) setValue("name", product.name);
+      if (product.nameAr) setValue("nameAr", product.nameAr);
+      if (product.category) setValue("category", product.category);
+      if (product.price) setValue("price", product.price);
+      if (product.originalPrice) setValue("originalPrice", product.originalPrice);
+      if (product.stock) setValue("stock", product.stock);
+      if (product.description) setValue("description", product.description);
+      if (typeof product.featured === "boolean") setValue("featured", product.featured);
+      setShowAiPanel(false);
+    } catch (err: any) {
+      setAiError(err.message || "Something went wrong. Please try again.");
+    } finally {
+      setIsAiLoading(false);
+    }
   };
 
   const handleFilesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -183,6 +225,59 @@ export default function ManageProducts() {
           <div className="bg-white rounded-3xl w-full max-w-3xl my-auto p-6 md:p-8 relative shadow-2xl">
             <button onClick={closeModal} className="absolute top-6 right-6 text-muted-foreground hover:text-secondary"><X size={24}/></button>
             <h2 className="text-2xl font-serif font-bold text-secondary mb-6">{editingId ? t.admin.products.editProduct : t.admin.products.newProduct}</h2>
+
+            {/* AI Assistant Panel */}
+            <div className="mb-6 rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/5 to-amber-50/50 overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setShowAiPanel(v => !v)}
+                className="w-full flex items-center justify-between px-5 py-4 text-left"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Sparkles size={16} className="text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-secondary text-sm">AI Product Assistant</p>
+                    <p className="text-xs text-muted-foreground">Describe the product and AI will fill all fields automatically</p>
+                  </div>
+                </div>
+                {showAiPanel ? <ChevronUp size={18} className="text-muted-foreground" /> : <ChevronDown size={18} className="text-muted-foreground" />}
+              </button>
+
+              {showAiPanel && (
+                <div className="px-5 pb-5 space-y-3 border-t border-primary/10">
+                  <div className="pt-4">
+                    <textarea
+                      value={aiPrompt}
+                      onChange={e => setAiPrompt(e.target.value)}
+                      rows={3}
+                      placeholder='e.g. "Premium Ajwa dates from Medina, 500g box, price 180 EGP, limited stock of 25"'
+                      className="w-full border border-border rounded-xl p-3 text-sm resize-none focus:ring-2 focus:ring-primary/50 outline-none bg-white"
+                      onKeyDown={e => {
+                        if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleAiGenerate();
+                      }}
+                    />
+                    {aiError && <p className="text-xs text-destructive mt-1">{aiError}</p>}
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs text-muted-foreground">Tip: You can edit the generated fields before saving</p>
+                    <button
+                      type="button"
+                      onClick={handleAiGenerate}
+                      disabled={isAiLoading || !aiPrompt.trim()}
+                      className="flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50"
+                    >
+                      {isAiLoading ? (
+                        <><Loader2 size={14} className="animate-spin" /> Generating...</>
+                      ) : (
+                        <><Sparkles size={14} /> Generate Fields</>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

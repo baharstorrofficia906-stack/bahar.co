@@ -7,6 +7,7 @@ import customersRouter from "./customers";
 import adminRouter from "./admin";
 import siteSettingsRouter from "./site-settings";
 import messagesRouter from "./messages";
+import aiProductsRouter from "./ai-products";
 
 const router: IRouter = Router();
 
@@ -18,5 +19,6 @@ router.use(customersRouter);
 router.use(adminRouter);
 router.use(siteSettingsRouter);
 router.use(messagesRouter);
+router.use(aiProductsRouter);
 
 export default router;
