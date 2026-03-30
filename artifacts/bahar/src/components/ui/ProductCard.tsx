@@ -85,12 +85,12 @@ export function ProductCard({ product }: ProductCardProps) {
         </button>
 
         {/* Image */}
-        <div className="aspect-[4/5] overflow-hidden bg-muted relative">
+        <div className="aspect-[4/5] overflow-hidden bg-white relative">
           {mainImage ? (
             <img 
               src={mainImage} 
               alt={product.name}
-              className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-700"
+              className="w-full h-full object-contain p-3 transform group-hover:scale-105 transition-transform duration-700"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-muted/50">
